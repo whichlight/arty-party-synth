@@ -302,7 +302,6 @@ Graphic.prototype.touchDeactivate = function(e){
   this.activated = false;
   $($fun).css("background-color","white");
 
-  two.update();
 }
 
 
