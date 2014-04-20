@@ -118,7 +118,7 @@ function Pluck(f){
   this.volume = 0.5;
   this.pitch = f;
   this.buildSynth();
-  this.duration = 1;
+  this.duration = 0.1;
 }
 
 Pluck.prototype.buildSynth = function(){
@@ -154,7 +154,7 @@ Pluck.prototype.setVolume= function(v){
 Pluck.prototype.play = function(dur){
   var dur = this.duration || dur;
   this.osc.noteOn(0); // Play instantly
-  this.gain.gain.setTargetValueAtTime(0, 0, 0.3);
+ // this.gain.gain.setTargetValueAtTime(0, 0, 0.3);
   var that = this;
   setTimeout(function(){
   //this looks funny because start and stop don't work on mobile yet
@@ -284,18 +284,8 @@ console.log(rgb);
   $($fun).css("background-color", rgb);
    // $("#press").html("MOVE");
   //var line = two.makeLine(x*$(window).width(), 0, x*window.width(), $(window).height())
-  var w = $(window).width();
-    two.clear();
-    var x1 = x*w;
-    var y1 = 0;
-    var x2 = x*w;
-    var y2 = $(window).height();
-    var line = two.makeLine(x1, y1, x2, y2)
-    line.linewidth = 500*(1-x);
-    line.opacity = 1-y;
-    line.stroke=  '#000';
-
-   two.update();
+  two.clear();
+  two.update();
 }
 
 Graphic.prototype.touchDeactivate = function(e){
