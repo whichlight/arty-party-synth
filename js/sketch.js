@@ -74,7 +74,7 @@ var setup = function(){
   var params = { width: $(window).width(), height: $(window).height()};
   two = new Two(params).appendTo(elem);
 
-  var rect = two.makeRectangle(two.width/2, two.height/2, 200, 200);
+  var rect = two.makeRectangle(two.width/2, two.height/2, 500, 500);
   rect.fill = "#000";
   rect.opacity = 0.5;
   two.update();
