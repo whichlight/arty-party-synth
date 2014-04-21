@@ -187,6 +187,7 @@ function Synth(){
    this.droneRoot = randArray([146.83, 196, 220.00]);
    this.play_note = true;
    this.arpI = 0;
+   this.LFO;
 }
 
 Synth.prototype.touchActivate= function(x,y){
@@ -214,7 +215,7 @@ Synth.prototype.playNote = function(){
     this.arpI++;
     this.play_note = false;
     var that = this;
-    setTimeout(function(){
+    this.LFO = setTimeout(function(){
       that.play_note = true;
     },n.duration*1000);
 
@@ -228,6 +229,8 @@ Synth.prototype.touchDeactivate= function(){
     d.stop();
   });
   this.arpI=0;
+  clearTimeout(this.LFO);
+  this.play_note = true;
 }
 
 var randArray = function(a){
