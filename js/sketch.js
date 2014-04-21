@@ -19,6 +19,16 @@ var q_notes = [146.832, 164.814, 174.614, 195.998, 220.000,
 246.942, 261.626, 293.665, 329.628, 349.228, 391.995, 440.000, 493.883, 523.251, 587.330, 659.255, 698.456, 783.991, 880.000, 987.767, 1046.502, 1174.659, 1318.510, 1396.913, 1567.982, 1760.000, 1975.533, 2093.005, 2349.318, 2637.020, 2793.826, 3135.963, 3520.000]
 
 
+//some scales from convo with @ericrosenbizzle
+//C1 E1 G1 C2 E2 G3 C3 E3 G3
+var arp1 = [0,2,4,8,10,12];
+var arp2=[0,2,4,6,8,10,12,14];
+var harmony = [0,5,7,8,12];
+
+//C1 G1 C2 E2 G2 A#2 C3 D3 E3 F#3 G3 G#3 A#3 B3 C4
+var harmonic_series;
+
+
 /**
  *
  accel events and touch mapped to Synth and Graphic
@@ -118,17 +128,17 @@ function Pluck(f){
   this.volume = 0.5;
   this.pitch = f;
   this.buildSynth();
-  this.duration = 0.1;
+  this.duration = 0.5;
 }
 
 Pluck.prototype.buildSynth = function(){
   this.osc = context.createOscillator(); // Create sound source
-  this.osc.type = 2; // Square wave
+  this.osc.type = 1;
   this.osc.frequency.value = this.pitch;
 
   this.filter = context.createBiquadFilter();
   this.filter.type = 0;
-  this.filter.frequency.value = 1000;
+  this.filter.frequency.value = 700;
 
   this.gain = context.createGainNode();
   this.gain.gain.value = this.volume;
@@ -169,65 +179,13 @@ Pluck.prototype.stop = function(){
 }
 
 
-
-function Drone(f){
-  this.filter;
-  this.gain;
-  this.osc;
-  this.played = false;
-  this.volume = 0.3;
-  this.pitch = f;
-  this.buildSynth();
-  this.play();
-}
-
-Drone.prototype.buildSynth = function(){
-  this.osc = context.createOscillator(); // Create sound source
-  this.osc.type = 2;
-  this.osc.frequency.value = this.pitch;
-
-  this.filter = context.createBiquadFilter();
-  this.filter.type = 0;
-  this.filter.frequency.value = 440;
-
-  this.gain = context.createGainNode();
-  this.gain.gain.value = this.volume;
-  //decay
-  this.osc.connect(this.filter); // Connect sound to output
-  this.filter.connect(this.gain);
-  this.gain.connect(context.destination);
-}
-
-Drone.prototype.setPitch = function(p){
-  this.osc.frequency.value = p;
-}
-
-Drone.prototype.setFilter = function(f){
-  this.filter.frequency.value = f;
-}
-
-Drone.prototype.setVolume= function(v){
-  this.gain.gain.value = v;
-  this.volume = v;
-}
-
-Drone.prototype.play = function(){
-  this.osc.noteOn(0); // Play instantly
-}
-
-Drone.prototype.stop = function(){
-    this.setVolume(0);
-    this.osc.disconnect();
-    return false;
-}
-
-
 function Synth(){
    this.activated =  false;
    this.notes = [220, 440, 880, 880*2];
    this.drones = [];
    this.droneRoot = randArray([146.83, 196, 220.00]);
    this.play_note = true;
+   this.arpI = 0;
 }
 
 Synth.prototype.touchActivate= function(x,y){
@@ -241,13 +199,22 @@ Synth.prototype.touchActivate= function(x,y){
 Synth.prototype.playNote = function(){
   if(this.play_note && this.activated){
     var n = new Pluck(146.83*2);
-    n.setPitch(quantize(map_range(this.x, 0,1,100,3000), q_notes));
+    var base_index = Math.round(map_range(this.x, 0,1,0,q_notes.length-15));
+    var arp = [0,3,6,8,10,14,16, 18];
+    //further along y, more of the arp
+    var arp_range = Math.floor(map_range(1-this.y,0,1,1,arp.length));
+    console.log(arp.length);
+    this.arpI %= (arp_range);
+    n.setPitch(q_notes[base_index+arp[this.arpI]]/2);
+    n.duration = Math.max(this.y*200/1000, 0.02);
     n.play();
+
+    this.arpI++;
     this.play_note = false;
     var that = this;
     setTimeout(function(){
       that.play_note = true;
-    },this.y*200);
+    },n.duration*1000);
   }
 }
 
@@ -256,6 +223,7 @@ Synth.prototype.touchDeactivate= function(){
   this.drones.forEach(function(d){
     d.stop();
   });
+  this.arpI=0;
 }
 
 var randArray = function(a){
@@ -280,7 +248,6 @@ Graphic.prototype.touchActivate = function(x,y){
   this.activated = true;
   var col = HSVtoRGB(x/2,1,1);
   var rgb = "rgb("+col.r+","+col.g+","+col.b+")";
-console.log(rgb);
   $($fun).css("background-color", rgb);
    // $("#press").html("MOVE");
   //var line = two.makeLine(x*$(window).width(), 0, x*window.width(), $(window).height())
