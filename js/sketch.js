@@ -7,6 +7,8 @@ var t = new Date();
 var hammertime;
     var prevent_scroll_drag = true;
 var two;
+var arpIndex;
+var arpRange;
 
 
 
@@ -70,7 +72,6 @@ var setup = function(){
     no_mouseevents: true
   })
   .on('touch', function(event){
-    console.log('touch');
     touchActivate(event);
   })
   .on('drag', function(event){
@@ -80,7 +81,7 @@ var setup = function(){
     touchDeactivate();
   });
 
-  var elem = document.getElementById('fun').children[0];
+  var elem = document.getElementById('fun');
   var params = { width: $(window).width(), height: $(window).height()};
   two = new Two(params).appendTo(elem);
 
@@ -203,8 +204,9 @@ Synth.prototype.playNote = function(){
     var arp = [0,3,6,8,10,14,16, 18];
     //further along y, more of the arp
     var arp_range = Math.floor(map_range(1-this.y,0,1,1,arp.length));
-    console.log(arp.length);
     this.arpI %= (arp_range);
+    arpIndex = this.arpI;
+    arpRange = arp_range;
     n.setPitch(q_notes[base_index+arp[this.arpI]]/2);
     n.duration = Math.max(this.y*200/1000, 0.02);
     n.play();
@@ -215,6 +217,8 @@ Synth.prototype.playNote = function(){
     setTimeout(function(){
       that.play_note = true;
     },n.duration*1000);
+
+    graphic.touchActivate();
   }
 }
 
@@ -245,13 +249,21 @@ function Graphic(){
 }
 
 Graphic.prototype.touchActivate = function(x,y){
+    two.clear();
   this.activated = true;
   var col = HSVtoRGB(x/2,1,1);
   var rgb = "rgb("+col.r+","+col.g+","+col.b+")";
   $($fun).css("background-color", rgb);
    // $("#press").html("MOVE");
   //var line = two.makeLine(x*$(window).width(), 0, x*window.width(), $(window).height())
-  two.clear();
+
+  var heightRect= two.height/arpRange;
+  var yc = (1-arpIndex/arpRange)*two.height;
+  yc -= (1/(2*arpRange))*two.height;
+  var rect = two.makeRectangle(two.width/2, yc, two.width, heightRect);
+  rect.fill = "#FFF";
+  rect.stroke= "#FFF";
+  rect.opacity = 0.6;
   two.update();
 }
 
