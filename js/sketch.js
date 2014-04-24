@@ -143,7 +143,10 @@ Pluck.prototype.buildSynth = function(){
 
   this.gain = context.createGainNode();
   this.gain.gain.value = this.volume;
-  //decay
+  //attack
+  //this.gain.gain.setTargetValueAtTime(this.volume, context.currentTime, 0.5 );
+  this.gain.gain.linearRampToValueAtTime(this.volume, context.currentTime + 0.01);
+
   this.osc.connect(this.filter); // Connect sound to output
   this.filter.connect(this.gain);
   this.gain.connect(context.destination);
@@ -166,11 +169,14 @@ Pluck.prototype.play = function(dur){
   var dur = this.duration || dur;
   this.osc.noteOn(0); // Play instantly
  // this.gain.gain.setTargetValueAtTime(0, 0, 0.3);
+  //this.gain.gain.setTargetValueAtTime(0, context.currentTime + 0.75*dur, 0.5 );
   var that = this;
+    console.log(dur/10.0);
   setTimeout(function(){
   //this looks funny because start and stop don't work on mobile yet
   //and noteOff doesnt allow new notes
-    that.setVolume(0);
+  //  that.setVolume(0);
+    that.gain.gain.linearRampToValueAtTime(0, context.currentTime + 0.01);
     that.osc.disconnect();
   },dur*1000);
 }
@@ -204,7 +210,7 @@ Synth.prototype.playNote = function(){
     var base_index = Math.round(map_range(this.x, 0,1,0,q_notes.length-15));
    // var arp = [0,7, 14, 21, 5,12,10,14,16, 18];
 
-    var arp = [0,7, 5,9,11, 14, 17, 19];
+    var arp = [0,7, 5,9,11, 14, 17, 19, 21];
     //further along y, more of the arp
     var arp_range = Math.floor(map_range(1-this.y,0,1,1,arp.length));
     arp = arp.slice(0,arp_range);
