@@ -214,8 +214,6 @@ Synth.prototype.playNote = function(){
     arpRange = arp_range;
     var p = q_notes[base_index+arp[this.arpI]]/2;
     n.setPitch(p);
-    console.log(p);
-    console.log(this.arpI);
     n.duration = Math.max(this.y*200/1000, 0.02);
     n.play();
 
