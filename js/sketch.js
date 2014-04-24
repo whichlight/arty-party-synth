@@ -202,13 +202,20 @@ Synth.prototype.playNote = function(){
   if(this.play_note && this.activated){
     var n = new Pluck(146.83*2);
     var base_index = Math.round(map_range(this.x, 0,1,0,q_notes.length-15));
-    var arp = [0,3,6,8,10,14,16, 18];
+   // var arp = [0,7, 14, 21, 5,12,10,14,16, 18];
+
+    var arp = [0,7, 5,9,11, 14, 17, 19];
     //further along y, more of the arp
     var arp_range = Math.floor(map_range(1-this.y,0,1,1,arp.length));
-    this.arpI %= (arp_range);
+    arp = arp.slice(0,arp_range);
+    arp.sort(function(a,b){return a-b});
+    this.arpI %= arp_range;
     arpIndex = this.arpI;
     arpRange = arp_range;
-    n.setPitch(q_notes[base_index+arp[this.arpI]]/2);
+    var p = q_notes[base_index+arp[this.arpI]]/2;
+    n.setPitch(p);
+    console.log(p);
+    console.log(this.arpI);
     n.duration = Math.max(this.y*200/1000, 0.02);
     n.play();
 
