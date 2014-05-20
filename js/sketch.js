@@ -167,7 +167,7 @@ Pluck.prototype.setVolume= function(v){
 
 Pluck.prototype.play = function(dur){
   var dur = this.duration || dur;
-  this.osc.noteOn(0); // Play instantly
+  this.osc.start(0); // Play instantly
  // this.gain.gain.setTargetValueAtTime(0, 0, 0.3);
   //this.gain.gain.setTargetValueAtTime(0, context.currentTime + 0.75*dur, 0.5 );
   var that = this;
