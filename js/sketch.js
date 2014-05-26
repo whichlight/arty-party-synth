@@ -141,7 +141,7 @@ Pluck.prototype.buildSynth = function(){
   this.filter.type = 0;
   this.filter.frequency.value = 700;
 
-  this.gain = context.createGainNode();
+  this.gain = context.createGain();
   this.gain.gain.value = this.volume;
   //attack
   //this.gain.gain.setTargetValueAtTime(this.volume, context.currentTime, 0.5 );
@@ -153,7 +153,7 @@ Pluck.prototype.buildSynth = function(){
 }
 
 Pluck.prototype.setPitch = function(p){
-  this.osc.frequency.value = p;
+  this.osc.frequency.value = p || 0;
 }
 
 Pluck.prototype.setFilter = function(f){
@@ -165,13 +165,12 @@ Pluck.prototype.setVolume= function(v){
   this.volume = v;
 }
 
-Pluck.prototype.play = function(dur){
-  var dur = this.duration || dur;
+Pluck.prototype.play = function(_dur){
+  var dur = this.duration || _dur;
   this.osc.start(0); // Play instantly
  // this.gain.gain.setTargetValueAtTime(0, 0, 0.3);
   //this.gain.gain.setTargetValueAtTime(0, context.currentTime + 0.75*dur, 0.5 );
   var that = this;
-    console.log(dur/10.0);
   setTimeout(function(){
   //this looks funny because start and stop don't work on mobile yet
   //and noteOff doesnt allow new notes
@@ -201,7 +200,6 @@ Synth.prototype.touchActivate= function(x,y){
   this.x = x;
   this.y = y;
   this.playNote();
-
 }
 
 Synth.prototype.playNote = function(){
@@ -229,7 +227,6 @@ Synth.prototype.playNote = function(){
     this.LFO = setTimeout(function(){
       that.play_note = true;
     },n.duration*1000);
-
     graphic.touchActivate();
   }
 }
